@@ -1,0 +1,22 @@
+__pycache__
+#
+*.pyc
+# Dataset folder
+/dataset/
+# Figures folder
+/figures/
+# Output folder
+/output_dir/
+# Dotenv
+.env
+# Logs folder
+/logs/
+# IDE
+.idea/
+# Logs
+*.out
+# Weights
+*.h5!
+!/notebooks/.ipynb_checkpoints/
+!/notebooks/.idea/
+!/.empty/
