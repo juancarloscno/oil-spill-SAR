@@ -1,3 +1,15 @@
+# Global variables
+
+## HPC - Instance size options:
+### small: 8 cores, 16GB RAM, 1 GPU
+### medium: 16 cores, 32GB RAM, 1 GPU
+### large: 32 cores, 64GB RAM, 1 GPU
+INSTANCE_SIZE=default
+## By default, use the following configurations:
+MEMORY_RAM=16G
+N_vCPU=8
+N_GPU=1
+
 ## Delete all compiled Python files
 clean:
 	find . -type f -name "*.py[co]" -delete
@@ -12,3 +24,23 @@ sync_repo_from_git:
 	git checkout main
 	git fetch origin main
 	git pull
+
+## Request to allocate job on High-Performance Computing (HPC) cluster
+allocate_job:
+	@echo "Requesting allocation for $(INSTANCE_SIZE) size instance..."
+ifeq (default,$(INSTANCE_SIZE))
+	@salloc -n 1 --mem=$(MEMORY_RAM) -c $(N_vCPU) --gpus=$(N_GPU)
+else ifeq (small,$(INSTANCE_SIZE))
+	@salloc -n 1 --mem=16G -c 8 --gpus=1
+else ifeq (medium,$(INSTANCE_SIZE))
+	@salloc -n 1 --mem=32G -c 16 --gpus=1
+else ifeq (large,$(INSTANCE_SIZE))
+	@salloc -n 1 --mem=64G -c 32 --gpus=1
+else
+	@echo "Invalid instance size. Please choose from: default, small, medium, large"
+endif
+
+## Cancel allocated job on High-Performance Computing (HPC) cluster
+cancel_job:
+	@echo "Canceling allocated job..."
+	@scancel ${SLURM_JOB_ID}
