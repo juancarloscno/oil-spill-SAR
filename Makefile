@@ -10,10 +10,11 @@ MEMORY_RAM=16G
 N_vCPU=8
 N_GPU=1
 
-## Delete all compiled Python files
+## Delete all compiled Python files and other UNIX-like files
 clean:
 	find . -type f -name "*.py[co]" -delete
 	find . -type d -name "__pycache__" -delete
+	find . -type f -name "*.out" -delete
 
 ## Push all committed files to currently branch
 sync_repo_to_git:
