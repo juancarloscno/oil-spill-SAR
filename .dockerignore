@@ -1,0 +1,15 @@
+# Created by .ignore support plugin (hsz.mobi)
+# Dataset folder
+data/
+# Output dir
+output_dir/
+# Dotenv
+.env
+# Dockerfile
+Dockerfile
+Dockerfile.dev
+# Logs
+logs/
+# IDE
+.idea//dataset/
+/.empty/
