@@ -16,6 +16,10 @@ clean:
 	find . -type d -name "__pycache__" -delete
 	find . -type f -name "*.out" -delete
 
+## Reformats all Python files using Black
+lint:
+	black src
+
 ## Push all committed files to currently branch
 sync_repo_to_git:
 	git push -u origin $(git rev-parse --abbrev-ref HEAD)
