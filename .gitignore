@@ -2,7 +2,7 @@ __pycache__
 #
 *.pyc
 # Dataset folder
-/dataset/
+/data/
 # Figures folder
 /figures/
 # Output folder
