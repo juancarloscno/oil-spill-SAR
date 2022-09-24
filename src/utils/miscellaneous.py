@@ -1,4 +1,6 @@
 import os
+import zipfile
+
 import requests
 import typer
 
@@ -28,3 +30,25 @@ def download_url(url, output_dir=None):
                     return file.name
         else:
             response.raise_for_status()
+
+    return filename
+
+
+def extract_all_files(filepath, output_dir=None):
+    """Extract all files from a zipfile to root or specific directory."""
+    if is_zip(filepath):
+        with zipfile.ZipFile(filepath) as file:
+            print("Extracting files from {}...".format(os.path.basename(filepath)))
+            file.extractall(path=output_dir)
+            print("Extraction has been completed successfully!")
+    else:
+        raise Exception("This file is not a zip file.")
+
+
+def is_zip(filepath):
+    """Test if is a ZIP file."""
+    ext = os.path.splitext(filepath)[-1][1:]
+    if ext == "zip":
+        return True
+    else:
+        return False
