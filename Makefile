@@ -53,9 +53,9 @@ cancel_job:
 ## Build Docker image
 build_from_docker:
 	@echo "Building Docker image..."
-	@shell sh ./scripts/docker/build.sh
+	@sh ./scripts/docker/build.sh
 
 ## Run Docker image
 run_docker_container:
 	@echo "Running Docker container..."
-	@shell sh scripts/docker/run.sh
+	@sh scripts/docker/run.sh
