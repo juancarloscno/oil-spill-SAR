@@ -49,3 +49,8 @@ endif
 cancel_job:
 	@echo "Canceling allocated job..."
 	@scancel ${SLURM_JOB_ID}
+
+## Build Docker image
+build_from_docker:
+	@echo "Building Docker image..."
+	@shell sh ./scripts/docker/build.sh
