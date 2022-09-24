@@ -24,7 +24,8 @@ def download_mklab_dataset():
     for folder in os.listdir(out_dir):
         if os.path.isdir(os.path.join(out_dir, folder)):
             for file in os.listdir(os.path.join(out_dir, folder)):
-                os.rename(os.path.join(out_dir, folder, file), os.path.join(out_dir, file))
+                os.rename(
+                    os.path.join(out_dir, folder, file), os.path.join(out_dir, file)
+                )
             os.rmdir(os.path.join(out_dir, folder))
     print("Dataset has been downloaded and extracted successfully!")
-
