@@ -11,5 +11,11 @@ Dockerfile.dev
 # Logs
 logs/
 # IDE
-.idea//dataset/
-/.empty/
+.idea/
+# Weights
+*.h5/
+# Cache
+.cache/
+# Git
+.git
+
