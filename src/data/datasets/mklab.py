@@ -1,8 +1,15 @@
 from src.utils.definitions import UNPROCESSED_DATA_DIR
 from src.utils.miscellaneous import download_url, extract_all_files
+from src.features.connected_components import (
+    get_bitmask,
+    get_connected_component_labels,
+)
+from src.coco.utils import encode_mask, bbox_from_encoded_mask, area_from_encoded_mask
 from dotenv import find_dotenv, load_dotenv
 import os
 import json
+import cv2
+import numpy as np
 
 
 def from_mklab_to_coco_format(input_dir, output_dir, subset="train"):
@@ -66,7 +73,6 @@ def from_mklab_to_coco_format(input_dir, output_dir, subset="train"):
         if os.path.isdir(os.path.join(input_dir, folder)):
             # Walk over images folder
             for file in os.listdir(os.path.join(input_dir, folder, "images")):
-                print(file)
                 if file.endswith(".jpg"):
                     image_id += 1
                     # Add the image
@@ -78,23 +84,58 @@ def from_mklab_to_coco_format(input_dir, output_dir, subset="train"):
                     }
                     coco_dataset["images"].append(image)
                     # Add the annotation
-                    # TODO: Implement the categories, segmentations and bbox part using instance masks
-                    #  instead of segmentation masks.
-                    annotation = {
-                        "id": annotation_id,
-                        "image_id": image_id,
-                        "category_id": None,
-                        "segmentation": [],
-                        "area": 0,
-                        "bbox": [],
-                        "iscrowd": 0,
-                    }
-                    coco_dataset["annotations"].append(annotation)
-                    annotation_id += 1
+                    ## Annotations section
+                    # Read the segmentation mask
+                    filepath = os.path.join(
+                        input_dir, folder, "labels_1D", file.replace(".jpg", ".png")
+                    )
+                    mask = cv2.imread(filepath, cv2.IMREAD_UNCHANGED)
+                    n_classes = np.max(mask) + 1
+                    if n_classes == 1:
+                        # The image is empty
+                        continue
+                    # Create the segmentation
+                    for c in range(n_classes):
+                        # Skip the background class
+                        if c == 0:
+                            continue
+                        # Get a bitmask of the class-of-interest from segmentation mask
+                        bitmask = get_bitmask(mask, c)
+                        # Get connected components
+                        num_labels, labels = get_connected_component_labels(bitmask)
+                        if num_labels == 1:
+                            # If there is only one connected component, num_labels is equal to 2.
+                            # But, when there is not a connected component, num_labels is equal to 1, so
+                            # is assumed that the segmentation mask is an 2d-array filled with zeros.
+                            # Then, we skip it.
+                            continue
+                        for k in range(1, num_labels):
+                            # The range starts from 1 because k=0 is the background.
+                            # Get the connected component
+                            instance_mask = get_bitmask(labels, k)
+                            # Get the bounding box
+                            encoded_mask = encode_mask(instance_mask)
+                            # Create the annotation
+                            annotation = {
+                                "id": annotation_id,
+                                "image_id": image_id,
+                                "category_id": c,
+                                "segmentation": encoded_mask,
+                                "area": int(
+                                    area_from_encoded_mask(encoded_mask)
+                                ),  # int() is necessary
+                                "bbox": bbox_from_encoded_mask(encoded_mask)
+                                .astype(int)
+                                .tolist(),
+                                # int() is necessary
+                                "iscrowd": 0,
+                            }
+                            coco_dataset["annotations"].append(annotation)
+                            annotation_id += 1
     # Save the COCO dataset
     print("Saving reformated dataset to: {}".format(output_dir))
-    with open(os.path.join(output_dir, "annotations.json".format(subset)), "w") as f:
-        json.dump(coco_dataset, f)
+    with open(os.path.join(output_dir, "annotations.json"), "w") as f:
+        json.dump(coco_dataset, f, indent=4, sort_keys=True)
 
     # Copy the images
     output_images_dir = os.path.join(output_dir, "images")
