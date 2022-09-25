@@ -51,11 +51,11 @@ cancel_job:
 	@scancel ${SLURM_JOB_ID}
 
 ## Build Docker image
-build_from_docker:
+build_docker:
 	@echo "Building Docker image..."
 	@sh ./scripts/docker/build.sh
 
 ## Run Docker image
-run_docker_container:
+run_docker:
 	@echo "Running Docker container..."
 	@sh scripts/docker/run.sh
