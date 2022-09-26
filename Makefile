@@ -9,12 +9,19 @@ INSTANCE_SIZE=default
 MEMORY_RAM=16G
 N_vCPU=8
 N_GPU=1
+PYTHON_INTERPRETER = python3
 
 ## Delete all compiled Python files and other UNIX-like files
 clean:
 	find . -type f -name "*.py[co]" -delete
 	find . -type d -name "__pycache__" -delete
 	find . -type f -name "*.out" -delete
+
+## Prepare all data 
+# TODO: Add Sentinel-1 calibration steps
+.PHONY: data
+data: 
+	python src/data/make_dataset.py data/unprocessed/mklab data/processed/mklab
 
 ## Reformats all Python files using Black
 lint:
