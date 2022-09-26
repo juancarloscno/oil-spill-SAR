@@ -15,6 +15,9 @@ LABEL maintainer="Juan Carlos Cedeño <juancn95@gmail.com>"
 # Set project directory
 WORKDIR oil-spill-SAR
 
+# Add PYTHONPATH
+ENV PYTHONPATH="${PYTHONPATH}:$(pwd)"
+
 # Copy requirements.txt to the container at work directory
 COPY requirements.txt .
 
