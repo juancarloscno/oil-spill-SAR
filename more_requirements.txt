@@ -1,0 +1,4 @@
+tensorflow~=2.3.0
+horovod~=0.23.0
+cupy-cuda110~=9.6.0
+nvidia-dali-cuda110~=0.25.1
