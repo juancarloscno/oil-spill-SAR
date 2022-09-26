@@ -15,8 +15,6 @@ def encode_mask(mask, dtype=np.uint8):
     """
     if mask.dtype != dtype:
         mask = mask.astype(dtype)
-    encoded_mask = mask_utils.encode(np.asfortranarray(mask))
-    return encoded_mask
     rle = mask_utils.encode(np.asfortranarray(mask, dtype=dtype))
     rle["counts"] = six.ensure_str(rle["counts"])
     return rle
