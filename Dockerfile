@@ -21,6 +21,7 @@ COPY requirements.txt .
 # Install dependencies
 RUN pip install -U pip
 RUN pip install -r requirements.txt
+RUN rm requirements.txt
 
 # Install other dependencies such as linters. This is not necessary for the project
 RUN pip install black
