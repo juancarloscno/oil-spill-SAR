@@ -12,6 +12,8 @@ Dockerfile.dev
 logs/
 # IDE
 .idea/
+.devcontainer/
+.vscode/
 # Weights
 *.h5/
 # Cache

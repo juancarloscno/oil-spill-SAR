@@ -13,6 +13,8 @@ __pycache__
 /logs/
 # IDE
 .idea/
+.vscode/
+.devcontainer
 # Logs
 *.out
 # Weights
