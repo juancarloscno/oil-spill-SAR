@@ -36,11 +36,11 @@ ifneq (,$(wildcard ./.env))
 endif
 
 ## Push all committed files to currently branch
-sync_repo_to_git:
+sync_to_git:
 	git push -u origin $(git rev-parse --abbrev-ref HEAD)
 
 ## Pull all files from remote repository
-sync_repo_from_git:
+sync_from_git:
 	git checkout main
 	git fetch origin main
 	git pull
