@@ -22,3 +22,7 @@ __pycache__
 !/notebooks/.ipynb_checkpoints/
 !/notebooks/.idea/
 !/.empty/
+# SSH folder
+/ssh/
+# DS_Store
+.DS_Store
