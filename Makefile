@@ -10,6 +10,7 @@ MEMORY_RAM=16G
 N_vCPU=8
 N_GPU=1
 PYTHON_INTERPRETER = python3
+PROJECT_NAME = oil-spill-SAR
 
 ## Delete all compiled Python files and other UNIX-like files
 clean:
@@ -27,6 +28,13 @@ data:
 lint:
 	black src
 
+## Load dotenv
+load_dotenv:
+ifneq (,$(wildcard ./.env))
+    include .env
+    export
+endif
+
 ## Push all committed files to currently branch
 sync_repo_to_git:
 	git push -u origin $(git rev-parse --abbrev-ref HEAD)
@@ -36,6 +44,11 @@ sync_repo_from_git:
 	git checkout main
 	git fetch origin main
 	git pull
+
+## Sync local repository with remote repository using rsync
+sync_to_remote: load_dotenv
+	@rsync -avz -e "ssh -i $(IDENTITY_FILE)" . $(REMOTE_USERNAME)@$(REMOTE_HOSTNAME):$(PROJECT_NAME)/ \
+	--exclude-from=rsync_exclude.txt
 
 ## Request to allocate job on High-Performance Computing (HPC) cluster
 allocate_job:
