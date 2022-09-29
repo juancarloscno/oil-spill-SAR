@@ -1,10 +1,11 @@
 #!/bin/bash
-# Installer Workflow Script
-# This script create an unprivileged rootfs container with SNAP Toolbox, GTP and Snapista (Thin layer of GTP for Python)
-# for preprocess Sentinel-1 images downloaded from Copernicus Open Access Hub
-# Copyright (c) 2022 Juan Carlos Cedeño
-# Licensed under the MIT License (see LICENSE for details)
-# Written by Juan Carlos Cedeño
+# Enroot Workflow: Script to create an unprivileged rootfs container with SNAP Toolbox, GTP and Snapista (Thin layer of GTP for Python)
+# for preprocessing of Sentinel-1 imagery downloaded from Copernicus Open Access Hub
+# Copyright (c) 2022 Juan Carlos Cedeño Noblecilla
+
+# This software is released under the MIT License.
+# https://opensource.org/licenses/MIT
+# Written by Juan Carlos Cedeño Noblecilla.
 
 # Arguments
 PROJECT=oil-spill-SAR
