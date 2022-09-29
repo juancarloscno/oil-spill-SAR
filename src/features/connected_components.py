@@ -1,10 +1,10 @@
 """
-Labeling Components
-Functions to extract connected components form segmentation masks.
+Connected Components
+Functions to extract connected components from segmentation masks.
 
-Copyright (c) 2020 Juan Carlos Cedeño.
+Copyright (c) 2022 Juan Carlos Cedeño.
 Licensed under the MIT License (see LICENSE for details)
-Written by Juan Carlos Cedeño.
+Written by Juan Carlos Cedeño Noblecilla.
 """
 import cv2
 import numpy as np
