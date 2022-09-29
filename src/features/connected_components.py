@@ -43,5 +43,7 @@ def get_connected_component_labels(bitmask, connectivity=8):
                 supported_connectivity
             )
         )
-    num_labels, labels = cv2.connectedComponents(image=bitmask, connectivity=connectivity)
+    num_labels, labels = cv2.connectedComponents(
+        image=bitmask, connectivity=connectivity
+    )
     return num_labels, labels
