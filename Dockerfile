@@ -1,3 +1,11 @@
+# Dockerfile for the Docker image that will be used to build the project
+
+# Copyright (c) 2022 Juan Carlos Cedeño Noblecilla
+
+# This software is released under the MIT License.
+# https://opensource.org/licenses/MIT
+# Written by Juan Carlos Cedeño Noblecilla.
+
 # Arguments
 ARG NVIDIA_RELEASE=20.09
 ARG PYTHON_VERSION_FLAG=py3
@@ -13,7 +21,7 @@ FROM nvcr.io/nvidia/${PLATFORM}:${NVIDIA_RELEASE}-${TF_VERSION_FLAG}-${PYTHON_VE
 LABEL maintainer="Juan Carlos Cedeño <juancn95@gmail.com>"
 
 # Set project directory
-WORKDIR oil-spill-SAR
+WORKDIR /oil-spill-SAR
 
 # Add PYTHONPATH
 ENV PYTHONPATH="${PYTHONPATH}:$(pwd)"
