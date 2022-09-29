@@ -1,9 +1,11 @@
 #!/bin/bash
-# Containerization Workflow Script
-# This script create an unprivileged rootfs container with GPU capabilities enabled from a docker image
-# Copyright (c) 2022 Juan Carlos Cedeño
-# Licensed under the MIT License (see LICENSE for details)
-# Written by Juan Carlos Cedeño
+# Enroot Workflow: Script to create an unprivileged rootfs container (GPU capabilities enabled) from a docker image
+
+# Copyright (c) 2022 Juan Carlos Cedeño Noblecilla
+
+# This software is released under the MIT License.
+# https://opensource.org/licenses/MIT
+# Written by Juan Carlos Cedeño Noblecilla.
 
 # Set environment variables from dotenv
 export $(cat ~/oil-spill-SAR/.env | xargs)
