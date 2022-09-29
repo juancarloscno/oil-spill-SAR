@@ -1,9 +1,11 @@
 #!/bin/bash
-# Containerization Workflow Script
-# This script launch unprivileged sandbox created with GPU capabilities enabled
-# Copyright (c) 2022 Juan Carlos Cedeño
-# Licensed under the MIT License (see LICENSE for details)
-# Written by Juan Carlos Cedeño
+# Enroot Workflow: Script to run the created enroot container
+
+# Copyright (c) 2022 Juan Carlos Cedeño Noblecilla
+
+# This software is released under the MIT License.
+# https://opensource.org/licenses/MIT
+# Written by Juan Carlos Cedeño Noblecilla.
 
 # Export environments variable from dotenv
 export $(cat ~/oil-spill-SAR/.env | xargs)
