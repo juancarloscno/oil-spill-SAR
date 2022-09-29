@@ -2,8 +2,10 @@
 Connected Components
 Functions to extract connected components from segmentation masks.
 
-Copyright (c) 2022 Juan Carlos Cedeño.
-Licensed under the MIT License (see LICENSE for details)
+Copyright (c) 2022 Juan Carlos Cedeño Noblecilla
+
+This software is released under the MIT License.
+https://opensource.org/licenses/MIT
 Written by Juan Carlos Cedeño Noblecilla.
 """
 import cv2
