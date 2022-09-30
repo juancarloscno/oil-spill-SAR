@@ -58,7 +58,7 @@ class Sentinel1GroundRangeDetectedPreprocessing:
             filename = filename + "_" + subset_index
             self.tmp_dir = os.path.join(self.tmp_dir, subset_index)
         if not os.path.exists(self.tpm_dir):
-            os.mkdir(self.tpm_dir)
+            os.makedirs(self.tpm_dir)
         xml_filepath = os.path.join(self.tpm_dir, "{}.xml".format(filename))
         workflow = self.get_workflow(subset)
         workflow.write(xml_filepath)
