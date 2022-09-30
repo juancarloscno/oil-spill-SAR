@@ -71,7 +71,7 @@ class Sentinel1GroundRangeDetectedPreprocessing:
         print("Preprocessing has completed successfully at {}s!".format(end - start))
 
     @staticmethod
-    def prepare_subset(safe_file: str):
+    def parse_subset(safe_file: str):
         """Helper function to split a scene into 4 subsets with an overlap of 2%. This is useful for run faster
         preprocessing (~4min)."""
         scene = identify(safe_file)
@@ -269,7 +269,7 @@ def calibrate(
             preprocessing = Sentinel1GroundRangeDetectedPreprocessing(
                 input_safe_file=safe_filepath, output_dir=results_dir
             )
-            subsets = preprocessing.prepare_subset(safe_filepath)
+            subsets = preprocessing.parse_subset(safe_filepath)
             start = time.time()
             with Pool(4) as pool:
                 pool.map(preprocessing, subsets)
