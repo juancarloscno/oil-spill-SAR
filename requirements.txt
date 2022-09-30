@@ -20,3 +20,4 @@ geopy~=2.2.0
 cachetools~=4.1.1
 geojson~=2.5.0
 requests~=2.24.0
+cupy-cuda110~=9.6.0
