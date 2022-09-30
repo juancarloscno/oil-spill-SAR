@@ -30,4 +30,7 @@ enroot import --output "$SQSH_FILE" docker://nvcr.io#nvidia/${PLATFORM}:${NVIDIA
 # Create an container rootfs (RF) from SQSH file downloaded
 enroot create --force --name $PROJECT "$SQSH_FILE"
 # Install python dependencies
-enroot start --rw $PROJECT pip --no-cache-dir install opencv-python-headless scikit-image albumentations cupy-cuda110 numba rasterio sentinelsat typer tqdm tabulate python-dotenv geopandas
+enroot start --rw --mount "${HOME}"/oil-spill-SAR:"${HOME}"/oil-spill-SAR \ 
+    sh -c cd "${HOME}"/oil-spill-SAR & \
+    pip install -U pip & \ 
+    pip --no-cache-dir install -r "${HOME}"/oil-spill-SAR/requirements.txt
