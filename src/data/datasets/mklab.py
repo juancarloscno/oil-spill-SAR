@@ -187,3 +187,6 @@ def download_mklab_dataset():
                 )
             os.rmdir(os.path.join(out_dir, folder))
     print("Dataset has been downloaded and extracted successfully!")
+
+if __name__ == "__main__":
+    download_mklab_dataset()
