@@ -33,7 +33,7 @@ RAW_DATASET_DIR = os.path.join(DATASET_DIR, "raw")
 INFER_DATASET_DIR = os.path.join(DATASET_DIR, "infer", "images")
 
 
-class SARPreprocessor:
+class Sentinel1GroundRangeDetectedPreprocessing:
     def __init__(
         self,
         input_safe_file,
@@ -266,7 +266,7 @@ def calibrate(
                 )
                 continue
             # Instance graph
-            preprocessing = SARPreprocessor(
+            preprocessing = Sentinel1GroundRangeDetectedPreprocessing(
                 input_safe_file=safe_filepath, output_dir=results_dir
             )
             subsets = preprocessing.prepare_subset(safe_filepath)
