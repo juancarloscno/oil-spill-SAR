@@ -24,6 +24,7 @@ from pyroSAR.snap.auxil import groupbyWorkers
 from pyroSAR.snap.util import parse_node, parse_recipe
 
 from src.utils.miscellaneous import extract_all_files
+from src.utils.definitions import UNPROCESSED_DATA_DIR, PROCESSED_DATA_DIR, TMP_DIR
 
 # Root directory of the project
 ROOT_DIR = os.path.abspath("../")
@@ -34,44 +35,39 @@ INFER_DATASET_DIR = os.path.join(DATASET_DIR, "infer", "images")
 
 class SARPreprocessor:
     def __init__(
-            self,
-            input_safe_file,
-            output_dir,
-            memory_allocation_min="2G",
-            memory_allocation_max="32G",
+        self,
+        input_safe_file,
+        output_dir,
+        memory_allocation_min="2G",
+        memory_allocation_max="32G",
     ):
         self.safe_file = input_safe_file
         self.output_folder = output_dir
+        self.tmp_dir = TMP_DIR  # All XML files will be in the temporary folder (it will remove later)
         self.xms = memory_allocation_min
         self.xmx = memory_allocation_max
         os.environ["_JAVA_OPTIONS"] = "-Xms{} -Xmx{}".format(self.xms, self.xmx)
         os.environ["JAVA_TOOL_OPTIONS"] = "-Xms{} -Xmx{}".format(self.xms, self.xmx)
 
     def __call__(self, subset=None):
-        tpm_dir = os.path.join(
-            ROOT_DIR, "temp"
-        )  # Temporary folder to put all XML files (it will remove later)
         filename = self.get_filename(self.safe_file)
         if subset is not None:
-            filename = filename + "_{}_{}_{}_{}".format(
+            subset_index = "{}_{}_{}_{}".format(
                 subset[0], subset[1], subset[2], subset[3]
             )
-            tpm_dir = os.path.join(
-                tpm_dir,
-                "{}_{}_{}_{}".format(subset[0], subset[1], subset[2], subset[3]),
-            )
-        if not os.path.exists(tpm_dir):
-            os.mkdir(tpm_dir)
-        xml_filename = "{}.xml".format(filename)
-        xml_filepath = os.path.join(tpm_dir, xml_filename)
+            filename = filename + "_" + subset_index
+            self.tmp_dir = os.path.join(self.tmp_dir, subset_index)
+        if not os.path.exists(self.tpm_dir):
+            os.mkdir(self.tpm_dir)
+        xml_filepath = os.path.join(self.tpm_dir, "{}.xml".format(filename))
         work = self.preprocessing_chain(subset)
         work.write(xml_filepath)
 
         start = time.time()
-        gpt(xml_filepath, tpm_dir, groupbyWorkers(xml_filepath, 6))
+        gpt(xml_filepath, self.tpm_dir, groupbyWorkers(xml_filepath, 6))
         end = time.time()
         # Remove XML folder and its files
-        shutil.rmtree(tpm_dir)
+        shutil.rmtree(self.tpm_dir)
         print("Preprocessing has completed successfully at {}s!".format(end - start))
 
     @staticmethod
@@ -211,21 +207,21 @@ cli = typer.Typer()
 
 @cli.command()
 def calibrate(
-        dataset: str = typer.Option(
-            RAW_DATASET_DIR,
-            "--input",
-            "-in",
-            metavar="/path/to/dataset",
-            help="Path of the dataset with uncalibrated files. Either zip or .SAFE extension.",
-        ),
-        results_dir: str = typer.Option(
-            INFER_DATASET_DIR,
-            "--output",
-            "-out",
-            metavar="/path/to/results",
-            help="Path of output folder to " "save results.",
-        ),
-        limit: int = typer.Option(None, help="Limit"),
+    dataset: str = typer.Option(
+        RAW_DATASET_DIR,
+        "--input",
+        "-in",
+        metavar="/path/to/dataset",
+        help="Path of the dataset with uncalibrated files. Either zip or .SAFE extension.",
+    ),
+    results_dir: str = typer.Option(
+        INFER_DATASET_DIR,
+        "--output",
+        "-out",
+        metavar="/path/to/results",
+        help="Path of output folder to " "save results.",
+    ),
+    limit: int = typer.Option(None, help="Limit"),
 ):
     """Preprocessing Sentinel-1 Ground Range Detected SAR images."""
     # Walk files
