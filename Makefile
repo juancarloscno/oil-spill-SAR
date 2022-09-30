@@ -4,7 +4,7 @@
 ### small: 8 cores, 16GB RAM, 1 GPU
 ### medium: 16 cores, 32GB RAM, 1 GPU
 ### large: 32 cores, 64GB RAM, 1 GPU
-INSTANCE_SIZE=default
+INSTANCE_SIZE=large
 ## By default, use the following configurations:
 MEMORY_RAM=16G
 N_vCPU=8
@@ -79,3 +79,8 @@ build_docker:
 run_docker:
 	@echo "Running Docker container..."
 	@sh scripts/docker/run.sh
+
+## Build Enroot image
+build_enroot:
+	@echo "Building Enroot image..."
+	@sh ./scripts/enroot/build.sh
