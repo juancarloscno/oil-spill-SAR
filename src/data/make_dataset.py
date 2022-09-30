@@ -3,6 +3,7 @@ import click
 import logging
 from pathlib import Path
 from dotenv import find_dotenv, load_dotenv
+from src.data.datasets.mklab import from_mklab_to_coco_format
 
 
 @click.command()
@@ -12,6 +13,11 @@ def main(input_filepath, output_filepath):
     """Runs data processing scripts to turn raw data from (../unprocessed) into
     cleaned data ready to be analyzed (saved in ../processed).
     """
+    print("Making dataset...")
+    print("(1/2) Oil Spill Dataset (train)...")
+    from_mklab_to_coco_format(input_filepath, output_filepath, "train")
+    print("(2/2) Oil Spill Dataset (test)...")
+    from_mklab_to_coco_format(input_filepath, output_filepath, "test")
     logger = logging.getLogger(__name__)
     logger.info("making final data set from raw data")
 
@@ -22,6 +28,7 @@ if __name__ == "__main__":
 
     # not used in this stub but often useful for finding various files
     project_dir = Path(__file__).resolve().parents[2]
+    print(project_dir)
 
     # find .env automagically by walking up directories until it's found, then
     # load up the .env entries as environment variables
