@@ -60,8 +60,8 @@ class Sentinel1GroundRangeDetectedPreprocessing:
         if not os.path.exists(self.tpm_dir):
             os.mkdir(self.tpm_dir)
         xml_filepath = os.path.join(self.tpm_dir, "{}.xml".format(filename))
-        work = self.preprocessing_chain(subset)
-        work.write(xml_filepath)
+        workflow = self.get_workflow(subset)
+        workflow.write(xml_filepath)
 
         start = time.time()
         gpt(xml_filepath, self.tpm_dir, groupbyWorkers(xml_filepath, 6))
@@ -93,7 +93,7 @@ class Sentinel1GroundRangeDetectedPreprocessing:
         """Returns the input filename without its extension."""
         return os.path.basename(safe_file).replace(".SAFE", "")
 
-    def preprocessing_chain(self, subset: tuple = None):
+    def get_workflow(self, subset: tuple = None):
         """Create a Direct Acyclic Graph (DAG) XML specification for use in GPT's SNAP.
 
         Arguments
