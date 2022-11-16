@@ -7,13 +7,13 @@
 # Written by Juan Carlos Cedeño Noblecilla.
 
 # Arguments
-ARG NVIDIA_RELEASE=20.09
+ARG NVIDIA_RELEASE=21.07
 ARG PYTHON_VERSION_FLAG=py3
 ARG PLATFORM=tensorflow
 ARG TF_VERSION_FLAG=tf2
 
 # Build an image from NVIDIA NGC (Repository for NVIDIA Optimized Frameworks)
-# Release 20.09 is based on CUDA 11.0.3, which requires NVIDIA driver release 450.51
+# Release 20.09 is based on CUDA 11.4, which requires NVIDIA driver release 470 or later
 # compatible with NVIDIA GPUs of CEDIA's HPC
 FROM nvcr.io/nvidia/${PLATFORM}:${NVIDIA_RELEASE}-${TF_VERSION_FLAG}-${PYTHON_VERSION_FLAG}
 
