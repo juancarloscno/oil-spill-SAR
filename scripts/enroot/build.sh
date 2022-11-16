@@ -19,6 +19,44 @@ PROJECT=oil-spill-SAR
 SQSH_FILENAME=oil-spill-sar+tf2+py3.sqsh
 ROOT_DIR="${HOME}/${PROJECT}"
 SQSH_FILE="${ROOT_DIR}/${SQSH_FILENAME}"
+
+
+# Create a flag using getopts with the following options:
+# -d: Create a development container. 
+# -p: Create a production container
+# -h: Show help
+DEV=0
+PROD=0
+while getopts "d:ph" opt; do
+  case $opt in
+    d) DEV=$OPTARG
+    # Test if vscode or projector has been choosen
+    if [[ $DEV != "vscode" && $DEV != "projector" ]]; then
+      echo "Invalid option: $DEV. Valid options are: vscode or projector"
+      exit 1
+    fi
+    ;;
+    p) PROD=1
+    ;;
+    h) HELP_FLAG=1
+    ;;
+    \?) echo "Invalid option -$OPTARG" >&2
+    ;;
+  esac
+done
+
+# If the help flag is set, show the help message
+if [ $HELP_FLAG ]; then
+  echo "Usage: build.sh [OPTION]..."
+  echo "Create an unprivileged rootfs container (GPU capabilities enabled) from a custom docker image"
+  echo ""
+  echo "Options:"
+  echo "-d: Create a development container. This flag has two options: <vscode> OR <projector>"
+  echo "-p: Create a production container"
+  echo "-h: Show help"
+  exit 0
+fi
+
 # Delete any SQSH file locate in the root directory
 if test -f "$SQSH_FILE"; then
 #   Checks if .sqsh file exists, then delete it
