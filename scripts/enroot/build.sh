@@ -23,20 +23,18 @@ SQSH_FILE="${ROOT_DIR}/${SQSH_FILENAME}"
 
 # Create a flag using getopts with the following options:
 # -d: Create a development container. 
-# -p: Create a production container
 # -h: Show help
 DEV=0
 PROD=0
 while getopts "d:ph" opt; do
   case $opt in
-    d) DEV=$OPTARG
-    # Test if vscode or projector has been choosen
-    if [[ $DEV != "vscode" && $DEV != "projector" ]]; then
-      echo "Invalid option: $DEV. Valid options are: vscode or projector"
+    d) DEV_FLAG=1
+    DEV=$OPTARG
+    # Test if vscode or fleet has been choosen
+    if [[ $DEV != "vscode" && $DEV != "fleet" ]]; then
+      echo "Invalid option: $DEV. Valid options are: vscode or fleet"
       exit 1
     fi
-    ;;
-    p) PROD=1
     ;;
     h) HELP_FLAG=1
     ;;
@@ -48,11 +46,10 @@ done
 # If the help flag is set, show the help message
 if [ $HELP_FLAG ]; then
   echo "Usage: build.sh [OPTION]..."
-  echo "Create an unprivileged rootfs container (GPU capabilities enabled) from a custom docker image"
+  echo "Build an unprivileged rootfs container (GPU capabilities enabled) from a custom docker image"
   echo ""
   echo "Options:"
-  echo "-d: Create a development container. This flag has two options: <vscode> OR <projector>"
-  echo "-p: Create a production container"
+  echo "-d: Build container in development mode. This flag has two options: <vscode> OR <fleet>"
   echo "-h: Show help"
   exit 0
 fi
@@ -71,5 +68,22 @@ enroot create --force --name $PROJECT "$SQSH_FILE"
 # Install python dependencies
 enroot start --rw --mount "${HOME}"/oil-spill-SAR:"${HOME}"/oil-spill-SAR \ 
     sh -c cd "${HOME}"/oil-spill-SAR & \
-    python3 -m pip install -U pip & \ 
+    python3 -m pip install -U pip & \
     pip --no-cache-dir install -r "${HOME}"/oil-spill-SAR/requirements.txt
+
+if [ $DEV_FLAG ]; then
+    # Check if $DEV is vscode
+    if [ $DEV == "vscode" ]; then
+        # Then, install VSCode Server
+        echo "Installing VSCode Server by Microsoft..."
+        enroot start --rw --mount "${HOME}"/oil-spill-SAR:"${HOME}"/oil-spill-SAR \
+        sh -c cd "${HOME}"/oil-spill-SAR & \
+        wget -O- https://aka.ms/install-vscode-server/setup.sh | sh
+    else
+        # Otherwise, install Fleet by JetBrains
+        echo "Installing Fleet by JetBrains..."
+        enroot start --rw --mount "${HOME}"/oil-spill-SAR:"${HOME}"/oil-spill-SAR \
+        sh -c cd "${HOME}"/oil-spill-SAR & \
+        curl -LSs "https://download.jetbrains.com/product?code=FLL&release.type=preview&release.type=eap&platform=linux_x64" --output fleet && chmod +x fleet
+    fi
+fi
