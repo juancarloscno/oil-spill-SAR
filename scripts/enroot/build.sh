@@ -10,8 +10,9 @@
 # Set environment variables from dotenv
 export $(cat ~/oil-spill-SAR/.env | xargs)
 # Set arguments
-NVIDIA_RELEASE=20.09
+NVIDIA_RELEASE=21.07
 PYTHON_VERSION_FLAG=py3
+COCO_API_VERSION=v0.6.0
 PLATFORM=tensorflow
 TF_VERSION_FLAG=tf2
 PROJECT=oil-spill-SAR
@@ -32,5 +33,5 @@ enroot create --force --name $PROJECT "$SQSH_FILE"
 # Install python dependencies
 enroot start --rw --mount "${HOME}"/oil-spill-SAR:"${HOME}"/oil-spill-SAR \ 
     sh -c cd "${HOME}"/oil-spill-SAR & \
-    pip install -U pip & \ 
+    python3 -m pip install -U pip & \ 
     pip --no-cache-dir install -r "${HOME}"/oil-spill-SAR/requirements.txt
