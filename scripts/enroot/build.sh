@@ -1,4 +1,4 @@
-#!/bin/bash
+#!/bin/sh
 # Enroot Workflow: Script to create an unprivileged rootfs container (GPU capabilities enabled) from a docker image
 
 # Copyright (c) 2022 Juan Carlos Cedeño Noblecilla
@@ -19,6 +19,9 @@ PROJECT=oil-spill-SAR
 SQSH_FILENAME=oil-spill-sar+tf2+py3.sqsh
 ROOT_DIR="${HOME}/${PROJECT}"
 SQSH_FILE="${ROOT_DIR}/${SQSH_FILENAME}"
+# Variables related with Fleet IDE
+INSTALL_LOCATION=/usr/local/bin/fleet
+INSTALL_URL="https://download.jetbrains.com/product?code=FLL&release.type=preview&release.type=eap&platform=linux_x64"
 
 
 # Create a flag using getopts with the following options:
@@ -31,7 +34,7 @@ while getopts "d:ph" opt; do
     d) DEV_FLAG=1
     DEV=$OPTARG
     # Test if vscode or fleet has been choosen
-    if [[ $DEV != "vscode" && $DEV != "fleet" ]]; then
+    if [ $DEV != "vscode" ] && [ $DEV != "fleet" ]; then
       echo "Invalid option: $DEV. Valid options are: vscode or fleet"
       exit 1
     fi
@@ -66,24 +69,25 @@ enroot import --output "$SQSH_FILE" docker://nvcr.io#nvidia/${PLATFORM}:${NVIDIA
 # Create an container rootfs (RF) from SQSH file downloaded
 enroot create --force --name $PROJECT "$SQSH_FILE"
 # Install python dependencies
-enroot start --rw --mount "${HOME}"/oil-spill-SAR:"${HOME}"/oil-spill-SAR \ 
-    sh -c cd "${HOME}"/oil-spill-SAR & \
-    python3 -m pip install -U pip & \
-    pip --no-cache-dir install -r "${HOME}"/oil-spill-SAR/requirements.txt
+enroot start --rw --mount "$HOME"/oil-spill-SAR:"$HOME"/oil-spill-SAR \
+    sh -c cd "$HOME"/oil-spill-SAR & \
+    python -m pip install -U pip & \
+    pip --no-cache-dir install black & \
+    pip --no-cache-dir install -r "$HOME"/oil-spill-SAR/requirements.txt
 
 if [ $DEV_FLAG ]; then
     # Check if $DEV is vscode
     if [ $DEV == "vscode" ]; then
         # Then, install VSCode Server
         echo "Installing VSCode Server by Microsoft..."
-        enroot start --rw --mount "${HOME}"/oil-spill-SAR:"${HOME}"/oil-spill-SAR \
-        sh -c cd "${HOME}"/oil-spill-SAR & \
+        enroot start --rw "$PROJECT" \
         wget -O- https://aka.ms/install-vscode-server/setup.sh | sh
     else
         # Otherwise, install Fleet by JetBrains
         echo "Installing Fleet by JetBrains..."
-        enroot start --rw --mount "${HOME}"/oil-spill-SAR:"${HOME}"/oil-spill-SAR \
-        sh -c cd "${HOME}"/oil-spill-SAR & \
-        curl -LSs "https://download.jetbrains.com/product?code=FLL&release.type=preview&release.type=eap&platform=linux_x64" --output fleet && chmod +x fleet
+        enroot start --rw "$PROJECT" \
+        curl -sSL "$INSTALL_URL" -o "$INSTALL_LOCATION"
+        enroot start --rw --root "$PROJECT" chmod +x "$INSTALL_LOCATION"
     fi
 fi
+echo "The container has been built successfully!"
