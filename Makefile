@@ -70,17 +70,22 @@ cancel_job:
 	@echo "Canceling allocated job..."
 	@scancel ${SLURM_JOB_ID}
 
-## Build Docker image
+## Build Docker container
 build_docker:
 	@echo "Building Docker image..."
 	@sh ./scripts/docker/build.sh
 
-## Run Docker image
+## Run Docker container
 run_docker:
 	@echo "Running Docker container..."
 	@sh scripts/docker/run.sh
 
-## Build Enroot image
+## Build Enroot container
 build_enroot:
 	@echo "Building Enroot image..."
 	@sh ./scripts/enroot/build.sh
+
+## Run Enroot container
+run_enroot:
+	@echo "Running Enroot container..."
+	@sh ./scripts/enroot/run-mounted.sh oil-spill-SAR
