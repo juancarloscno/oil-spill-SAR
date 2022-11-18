@@ -1,4 +1,4 @@
-#!/bin/bash
+#!/bin/sh
 # Downloading Workflow: Script to download all Sentinel-1 SAR images used in the project.
 # This dataset consists of almost 10000 images along Ecuadorian Exclusive Economic Zone, each of ~1GB.
 
