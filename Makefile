@@ -4,7 +4,7 @@
 ### small: 8 cores, 16GB RAM, 1 GPU
 ### medium: 16 cores, 32GB RAM, 1 GPU
 ### large: 32 cores, 64GB RAM, 1 GPU
-INSTANCE_SIZE=large
+INSTANCE_SIZE=small
 ## By default, use the following configurations:
 MEMORY_RAM=16G
 N_vCPU=8
@@ -48,6 +48,11 @@ sync_from_git:
 ## Sync local repository with remote repository using rsync
 sync_to_remote: load_dotenv
 	@rsync -avz -e "ssh -i $(IDENTITY_FILE)" . $(REMOTE_USERNAME)@$(REMOTE_HOSTNAME):$(PROJECT_NAME)/ \
+	--exclude-from=rsync_exclude.txt
+
+## Sync local reporitory from remote repository using rsync
+sync_from_remote: load_dotenv
+	@rsync -avz -e "ssh -i $(IDENTITY_FILE)" $(REMOTE_USERNAME)@$(REMOTE_HOSTNAME):$(PROJECT_NAME)/ . \
 	--exclude-from=rsync_exclude.txt
 
 ## Request to allocate job on High-Performance Computing (HPC) cluster
