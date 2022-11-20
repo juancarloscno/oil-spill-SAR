@@ -1,16 +1,19 @@
-# Global variables
+#################################################################################
+# GLOBALS                                                                       #
+#################################################################################
 
-## HPC - Instance size options:
-### small: 8 cores, 16GB RAM, 1 GPU
-### medium: 16 cores, 32GB RAM, 1 GPU
-### large: 32 cores, 64GB RAM, 1 GPU
+# HPC - Instance size options:
+# small: 8 cores, 16GB RAM, 1 GPU (5GB per GPU), 8h runtime, NVIDIA A100 (Dev mode)
+# medium: 16 cores, 32GB RAM, 2 GPU (10 GB per GPU), 24h runtime, NVIDIA A100 (Min mode)
+# large: 32 cores, 64GB RAM, 2 GPU (20GB per GPU), 48h runtime, NVIDA A100 (Normal mode)
+# xlarge: 64 cores, 128GB RAM, 3 GPU (40GB per GPU), 72h runtime, NVIDIA A100 (Max mode)
 INSTANCE_SIZE=small
-## By default, use the following configurations:
-MEMORY_RAM=16G
-N_vCPU=8
-N_GPU=1
 PYTHON_INTERPRETER = python3
 PROJECT_NAME = oil-spill-SAR
+
+#################################################################################
+# COMMANDS                                                                      #
+#################################################################################
 
 ## Delete all compiled Python files and other UNIX-like files
 clean:
@@ -19,7 +22,7 @@ clean:
 	find . -type f -name "*.out" -delete
 
 ## Prepare all data 
-# TODO: Add Sentinel-1 calibration steps
+# TO-DO: Add Sentinel-1 calibration steps
 .PHONY: data
 data: 
 	python src/data/make_dataset.py data/unprocessed/mklab data/processed/mklab
@@ -28,7 +31,7 @@ data:
 lint:
 	black src
 
-## Load dotenv
+# Load dotenv
 load_dotenv:
 ifneq (,$(wildcard ./.env))
     include .env
@@ -55,19 +58,19 @@ sync_from_remote: load_dotenv
 	@rsync -avz -e "ssh -i $(IDENTITY_FILE)" $(REMOTE_USERNAME)@$(REMOTE_HOSTNAME):$(PROJECT_NAME)/ . \
 	--exclude-from=rsync_exclude.txt
 
-## Request to allocate job on High-Performance Computing (HPC) cluster
+## Request to allocate job on High-Performance Computing (HPC) cluster. Choose: <small>, <medium>, <large>, or <xlarge>
 allocate_job:
 	@echo "Requesting allocation for $(INSTANCE_SIZE) size instance..."
-ifeq (default,$(INSTANCE_SIZE))
-	@salloc -n 1 --mem=$(MEMORY_RAM) -c $(N_vCPU) --gpus=$(N_GPU)
-else ifeq (small,$(INSTANCE_SIZE))
-	@salloc -n 1 --mem=16G -c 8 --gpus=1
+ifeq (small,$(INSTANCE_SIZE))
+	@salloc -p gpu-dev -n 1 -c 12 --mem=24576M --gres=gpu:a100_2g.10gb:1 --time=4:00:00
 else ifeq (medium,$(INSTANCE_SIZE))
-	@salloc -n 1 --mem=32G -c 16 --gpus=1
+	@salloc -p gpu -n 1 -c 16 --mem=32768M --gres=gpu:a100_2g.10gb:2 --time=24:00:00
 else ifeq (large,$(INSTANCE_SIZE))
-	@salloc -n 1 --mem=64G -c 32 --gpus=1
+	@salloc -p gpu-max -n 1 -c 32 --mem=65536M --gres=gpu:a100_3g.20gb:2 --time=48:00:00
+else ifeq (xlarge,$(INSTANCE_SIZE))
+	@salloc -p gpu-max -n 1 -c 64 --mem=131072M --gres=gpu:a100-sxm4-40gb:3 --time=72:00:00
 else
-	@echo "Invalid instance size. Please choose from: default, small, medium, large"
+	@echo "Invalid instance size. Please choose from: default, small, medium, large or xlarge"
 endif
 
 ## Cancel allocated job on High-Performance Computing (HPC) cluster
@@ -94,3 +97,48 @@ build_enroot:
 run_enroot:
 	@echo "Running Enroot container..."
 	@sh ./scripts/enroot/run-mounted.sh oil-spill-SAR
+
+#################################################################################
+# Self Documenting Commands                                                     #
+#################################################################################
+
+.DEFAULT_GOAL := help
+
+.PHONY: help
+help:
+	@echo "$$(tput bold)Available rules:$$(tput sgr0)"
+	@echo
+	@sed -n -e "/^## / { \
+		h; \
+		s/.*//; \
+		:doc" \
+		-e "H; \
+		n; \
+		s/^## //; \
+		t doc" \
+		-e "s/:.*//; \
+		G; \
+		s/\\n## /---/; \
+		s/\\n/ /g; \
+		p; \
+	}" ${MAKEFILE_LIST} \ 
+	| LC_ALL='C' sort --ignore-case \
+	| awk -F '---' \
+		-v ncol=$$(tput cols) \
+		-v indent=19 \
+		-v col_on="$$(tput setaf 6)" \
+		-v col_off="$$(tput sgr0)" \
+	'{ \
+		printf "%s%*s%s ", col_on, -indent, $$1, col_off; \
+		n = split($$2, words, " "); \
+		for (i=1; i <= n; i++) { \
+			line_length -= length(words[i]) + 1; \
+			if (line_length <= 0) { \
+				line_length = ncol - indent - length(words[i]) - 1; \
+				printf "\n%*s ", -indent, " "; \
+			} \
+			printf "%s ", words[i]; \
+		} \
+		printf "\n"; \
+	}' \ 
+	| more $(shell test $(shell uname) = Darwim && echo '--no-init --raw-control-chars')
