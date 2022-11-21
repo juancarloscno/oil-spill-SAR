@@ -4,6 +4,7 @@ numpy~=1.19.5
 scikit-image~=0.19.3
 scipy~=1.4.1
 matplotlib~=3.6.2
+seaborn~=0.12.1
 ipython~=7.25.0
 typer~=0.7.0
 opencv-python-headless~=4.6.0
