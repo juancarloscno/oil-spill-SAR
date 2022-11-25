@@ -3,7 +3,8 @@ import click
 import logging
 from pathlib import Path
 from dotenv import find_dotenv, load_dotenv
-from src.data.datasets.mklab import from_mklab_to_coco_format
+from src.data.dataset.mklab import from_mklab_to_coco_format
+
 
 
 @click.command()
