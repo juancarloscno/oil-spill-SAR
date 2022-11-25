@@ -1,4 +1,4 @@
-from src.data.dataset.factory import Dataset
+from src.data.factory import Dataset
 from src.utils.definitions import UNPROCESSED_DATA_DIR
 from src.utils.miscellaneous import download_url, extract_all_files
 from src.features.connected_components import (
