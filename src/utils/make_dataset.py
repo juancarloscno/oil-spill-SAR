@@ -6,7 +6,6 @@ from dotenv import find_dotenv, load_dotenv
 from src.data.dataset.mklab import from_mklab_to_coco_format
 
 
-
 @click.command()
 @click.argument("input_filepath", type=click.Path(exists=True))
 @click.argument("output_filepath", type=click.Path())
