@@ -1,3 +1,4 @@
+from src.data.dataset.factory import Dataset
 from src.utils.definitions import UNPROCESSED_DATA_DIR
 from src.utils.miscellaneous import download_url, extract_all_files
 from src.features.connected_components import (
@@ -6,11 +7,155 @@ from src.features.connected_components import (
 )
 from src.coco.utils import encode_mask, bbox_from_encoded_mask, area_from_encoded_mask
 from dotenv import find_dotenv, load_dotenv
+from pycocotools.coco import COCO
+from pycocotools import mask as mask_utils
 import os
 import json
 import cv2
 import numpy as np
-    
+
+
+class OilSpillDetectionDataset(Dataset):
+    LABELS_VALUES = {
+        "sea": 0,
+        "oil_spill": 1,
+        "look_alike": 2,
+        "ship": 3,
+        "land": 4,
+    }
+
+    NAME_VALUES = {
+        0: "sea",
+        1: "oil_spill",
+        2: "look_alike",
+        3: "ship",
+        4: "land",
+    }
+
+    def load_oil_spills(self, dataset_dir, subset, class_names=None):
+        # class name used to labeling [source, class_id, class_name]
+        # Assertion of subset
+        assert subset in ["train", "test"]
+        # Read COCO annotation
+        dataset = COCO(os.path.join(dataset_dir, subset, "annotations.json"))
+        # Load all classes or a subset
+        if not class_names:
+            class_ids = sorted(dataset.getCatIds())
+        else:
+            class_ids = [self.LABELS_VALUES[class_name] for class_name in class_names]
+        # Create the images directory
+        images_dir = os.path.join(dataset_dir, subset, "images")
+        # Get images ids
+        if class_names:
+            image_ids = []
+            for id in class_ids:
+                image_ids.extend(dataset.getImgIds(catIds=[id]))
+                # Remove duplicates
+                image_ids = list(set(image_ids))
+        else:
+            image_ids = list(dataset.imgs.keys())
+
+        # Add classes
+        for i in class_ids:
+            self.add_class("mklab", i, dataset.loadCats(i)[0]["name"])
+
+        # Add images
+        for i in image_ids:
+            self.add_image(
+                "mklab",
+                image_id=i,
+                path=os.path.join(images_dir, dataset.imgs[i]["file_name"]),
+                width=dataset.imgs[i]["width"],
+                height=dataset.imgs[i]["height"],
+                annotations=dataset.loadAnns(
+                    dataset.getAnnIds(imgIds=[i], catIds=class_ids, iscrowd=None)
+                ),
+            )
+
+    def load_mask(self, image_id):
+        """Load instance masks for the given image id.
+
+        Returns:
+        masks: A bool array of shape [height, width, instance count] with
+            one mask per instance.
+        class_ids: A 1-D array of class IDs of the instance masks.
+        """
+
+        # Get dict with the image info
+        image_info = self.image_info[image_id]
+        # Return label path of the image mask
+        instance_masks = []
+        class_ids = []
+        annotations = self.image_info[image_id]["annotations"]
+
+        for annotation in annotations:
+            class_id = self.map_source_class_id(
+                "mklab.{}".format(annotation["category_id"])
+            )
+            if class_id:
+                mask = self.annToMask(
+                    annotation, image_info["height"], image_info["width"]
+                )
+
+                if mask.max() < 1:
+                    continue
+
+                if annotation["iscrowd"]:
+                    class_id *= -1
+
+                    if (
+                            mask.shape[0] != image_info["height"]
+                            or mask.shape[1] != image_info["width"]
+                    ):
+                        mask = np.ones(
+                            [image_info["height"], image_info["width"]], dtype=bool
+                        )
+                instance_masks.append(mask)
+                class_ids.append(class_id)
+
+        if class_ids:
+            masks = np.stack(instance_masks, axis=2).astype(np.bool)
+            class_ids = np.array(class_ids, dtype=np.int32)
+
+        return masks, class_ids
+
+    def image_reference(self, image_id):
+        """Return the path of the image."""
+        info = self.image_info[image_id]
+        if info["source"] == "mklab":
+            return info["id"]
+        else:
+            super(self.__class__, self).image_reference(image_id)
+
+    def annToRLE(self, ann, height, width):
+        """Convert annotation which can be polygons, uncompressed RLE to RLE.
+
+        Returns:
+            A binary mask (numpy 2D array)
+        """
+        segm = ann["segmentation"]
+        if isinstance(segm, list):
+            # polygon -- a single object might consist of multiple parts
+            # we merge all parts into one mask rle code
+            rles = mask_utils.frPyObjects(segm, height, width)
+            rle = mask_utils.merge(rles)
+        elif isinstance(segm["counts"], list):
+            # uncompressed RLE
+            rle = mask_utils.frPyObjects(segm, height, width)
+        else:
+            # rle
+            rle = ann["segmentation"]
+        return rle
+
+    def annToMask(self, ann, height, width):
+        """
+        Convert annotation which can be polygons, uncompressed RLE, or RLE to binary mask.
+        :return: binary mask (numpy 2D array)
+        """
+        rle = self.annToRLE(ann, height, width)
+        m = mask_utils.decode(rle)
+        return m
+
 
 def from_mklab_to_coco_format(input_dir, output_dir, subset="train"):
     """Convert the Oil Spill Detection dataset owned by Multimedia Knowledge and Social Media Analytics Laboratory
