@@ -106,13 +106,13 @@ class Sentinel1GroundRangeDetectedPreprocessing:
         Arguments
         ---------
         x: int
-            X coordinate
+            X upper-left coordinate of subset
         y: int
-            Y coordinate
+            Y upper-left coordinate of subset.
         w: int
-            Width
+            Width of subset.
         h: int
-            Height
+            Height of susbet.
 
 
         Returns
