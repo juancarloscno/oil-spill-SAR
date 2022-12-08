@@ -17,6 +17,7 @@ import shutil
 import time
 import zipfile
 from multiprocessing import Pool
+import asyncio
 
 import typer
 from pyroSAR import identify
@@ -26,7 +27,12 @@ from pyroSAR.snap.util import parse_node, parse_recipe
 
 # Import modules
 sys.path.append("..")
-from src.utils.definitions import ROOT_DIR, UNPROCESSED_DATA_DIR, PROCESSED_DATA_DIR, TMP_DIR
+from src.utils.definitions import (
+    ROOT_DIR,
+    UNPROCESSED_DATA_DIR,
+    PROCESSED_DATA_DIR,
+    TMP_DIR,
+)
 from src.utils.miscellaneous import extract_all_files
 
 # By default, use these folders to run preprocessing
@@ -94,13 +100,20 @@ class Sentinel1GroundRangeDetectedPreprocessing:
         """Returns the input filename without its extension."""
         return os.path.basename(safe_file).replace(".SAFE", "")
 
-    def get_workflow(self, subset: tuple = None):
+    def get_workflow(self, x: int, y: int, w: int, h: int):
         """Create a Direct Acyclic Graph (DAG) XML specification for use in GPT's SNAP.
 
         Arguments
         ---------
-        subset: tuple (optional)
-            Subset in (x, y, w, h) format used to for split image.
+        x: int
+            X coordinate
+        y: int
+            Y coordinate
+        w: int
+            Width
+        h: int
+            Height
+
 
         Returns
         -------
@@ -108,6 +121,7 @@ class Sentinel1GroundRangeDetectedPreprocessing:
         """
         filename = self.get_filename(self.safe_file)
         filepath = os.path.join(self.output_folder, "{}_sigma0_VV_dB".format(filename))
+        out_filepath = filepath + "_{}_{}_{}_{}".format(x, y, w, h)
 
         g = parse_recipe("blank")
 
@@ -120,18 +134,12 @@ class Sentinel1GroundRangeDetectedPreprocessing:
         source_id = op.id
 
         # Subset
-        if subset is not None:
-            assert isinstance(subset, tuple), "{} should be a tuple object.".format(
-                subset
-            )
-            x, y, w, h = subset
-            filepath = filepath + "_{}_{}_{}_{}".format(x, y, w, h)
-            op = parse_node("Subset")
-            op.parameters["region"] = "{}, {}, {}, {}".format(x, y, w, h)
-            op.parameters["copyMetadata"] = "true"
-            g.insert_node(op, source_id)
-            # Overwrite source id with newer operator
-            source_id = op.id
+        op = parse_node("Subset")
+        op.parameters["region"] = "{}, {}, {}, {}".format(x, y, w, h)
+        op.parameters["copyMetadata"] = "true"
+        g.insert_node(op, source_id)
+        # Overwrite source id with newer operator
+        source_id = op.id
 
         # Apply Orbit File: During the acquisition of S1 data the satellite position is recorded by GNSS. For fast
         # delivery, the orbit information generated are stored within the S1 products. The orbit positions are later
@@ -197,7 +205,7 @@ class Sentinel1GroundRangeDetectedPreprocessing:
         # Write GeoTIFF
         op = parse_node("Write")
         op.parameters["formatName"] = "GeoTIFF"
-        op.parameters["file"] = filepath
+        op.parameters["file"] = out_filepath
         g.insert_node(op, source_id)
 
         return g
