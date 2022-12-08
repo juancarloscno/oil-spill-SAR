@@ -29,9 +29,9 @@ sys.path.append("..")
 from src.utils.definitions import ROOT_DIR, UNPROCESSED_DATA_DIR, PROCESSED_DATA_DIR, TMP_DIR
 from src.utils.miscellaneous import extract_all_files
 
-# Root directory of the project
-IN_SENTINEL_DATA_DIR = os.path.join(UNPROCESSED_DATA_DIR, "sentinel_1")
-OUT_SENTINEL_DATA_DIR = os.path.join(PROCESSED_DATA_DIR, "sentinel_1")
+# By default, use these folders to run preprocessing
+IN_SENTINEL_1_DATA_DIR = os.path.join(UNPROCESSED_DATA_DIR, "sentinel_1")
+OUT_SENTINEL_1_DATA_DIR = os.path.join(PROCESSED_DATA_DIR, "sentinel_1")
 
 
 class Sentinel1GroundRangeDetectedPreprocessing:
@@ -209,14 +209,14 @@ cli = typer.Typer()
 @cli.command()
 def calibrate(
     dataset: str = typer.Option(
-        IN_SENTINEL_DATA_DIR,
+        IN_SENTINEL_1_DATA_DIR,
         "--input",
         "-in",
         metavar="/path/to/dataset",
         help="Path of the dataset with uncalibrated files. Either zip or .SAFE extension.",
     ),
     results_dir: str = typer.Option(
-        OUT_SENTINEL_DATA_DIR,
+        OUT_SENTINEL_1_DATA_DIR,
         "--output",
         "-out",
         metavar="/path/to/results",
