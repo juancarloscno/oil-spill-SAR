@@ -10,6 +10,7 @@ Licensed under the MIT License (see LICENSE for details)
 Written by Juan Carlos Cedeño.
 """
 
+import sys
 import glob
 import os
 import shutil
@@ -23,14 +24,14 @@ from pyroSAR.snap.auxil import gpt
 from pyroSAR.snap.auxil import groupbyWorkers
 from pyroSAR.snap.util import parse_node, parse_recipe
 
+# Import modules
+sys.path.append("..")
+from src.utils.definitions import ROOT_DIR, UNPROCESSED_DATA_DIR, PROCESSED_DATA_DIR, TMP_DIR
 from src.utils.miscellaneous import extract_all_files
-from src.utils.definitions import UNPROCESSED_DATA_DIR, PROCESSED_DATA_DIR, TMP_DIR
 
 # Root directory of the project
-ROOT_DIR = os.path.abspath("../")
-DATASET_DIR = os.path.join(ROOT_DIR, "dataset")
-RAW_DATASET_DIR = os.path.join(DATASET_DIR, "raw")
-INFER_DATASET_DIR = os.path.join(DATASET_DIR, "infer", "images")
+IN_SENTINEL_DATA_DIR = os.path.join(UNPROCESSED_DATA_DIR, "sentinel_1")
+OUT_SENTINEL_DATA_DIR = os.path.join(PROCESSED_DATA_DIR, "sentinel_1")
 
 
 class Sentinel1GroundRangeDetectedPreprocessing:
@@ -208,14 +209,14 @@ cli = typer.Typer()
 @cli.command()
 def calibrate(
     dataset: str = typer.Option(
-        RAW_DATASET_DIR,
+        IN_SENTINEL_DATA_DIR,
         "--input",
         "-in",
         metavar="/path/to/dataset",
         help="Path of the dataset with uncalibrated files. Either zip or .SAFE extension.",
     ),
     results_dir: str = typer.Option(
-        INFER_DATASET_DIR,
+        OUT_SENTINEL_DATA_DIR,
         "--output",
         "-out",
         metavar="/path/to/results",
