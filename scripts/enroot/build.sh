@@ -10,7 +10,6 @@
 # Set arguments
 NVIDIA_RELEASE=21.07
 PYTHON_VERSION_FLAG=py3
-COCO_API_VERSION=v0.6.0
 PLATFORM=tensorflow
 TF_VERSION_FLAG=tf2
 PROJECT=oil-spill-SAR
@@ -18,8 +17,6 @@ WORK_DIR="/workspace/${PROJECT}"
 SQSH_FILENAME=oil-spill-sar+tf2+py3.sqsh
 ROOT_DIR="${HOME}/${PROJECT}"
 SQSH_FILE="${ROOT_DIR}/${SQSH_FILENAME}"
-ESA_SNAP="esa-snap_sentinel_unix_8_0.sh"
-ESA_SNAP_LINK="https://download.esa.int/step/snap/8.0/installers/${ESA_SNAP}"
 
 # Delete any SQSH file locate in the root directory
 if test -f "$SQSH_FILE"; then
