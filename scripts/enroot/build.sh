@@ -36,10 +36,10 @@ printf "\nCreating an container rootfs (RF) from SQSH file downloaded...\n"
 enroot create --force --name $PROJECT "$SQSH_FILE"
 # Update and install packages
 printf "\nUpdating and installing packages in the container...\n"
-enroot start --root --rw $PROJECT sh -c 'apt update -y && apt install gdal-bin libsqlite3-mod-spatialite -y'
+enroot start --root --rw $PROJECT sh -c "apt update -y && apt install -y openjdk-8-jdk maven"
 # Install Sentinel Application Platform (SNAP) v8
 printf "\nInstalling Sentinel Application Platform (SNAP) v8 in the container...\n"
-enroot start --rw --mount "$PWD":$WORK_DIR $PROJECT sh -c "wget -O ${ESA_SNAP} ${ESA_SNAP_LINK} && chmod +x ${ESA_SNAP} && ./${ESA_SNAP} -q -varfile ${WORK_DIR}/esa-snap_install_unix_8_0.varfile"
+enroot start --rw --mount "$PWD":$WORK_DIR $PROJECT sh -c "cd ${WORK_DIR} && sh scripts/snap/build.sh"
 # Install python dependencies
 printf "\nInstalling python dependencies in the container...\n"
 enroot start --rw --mount "$PWD":$WORK_DIR $PROJECT sh -c "cd ${WORK_DIR} && pip --no-cache-dir install -r requirements.txt"
