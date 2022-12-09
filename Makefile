@@ -96,7 +96,7 @@ build_enroot:
 ## Run Enroot container
 run_enroot:
 	@echo "Running Enroot container..."
-	@sh ./scripts/enroot/run-mounted.sh oil-spill-SAR
+	@sh ./scripts/enroot/run.sh oil-spill-SAR
 
 #################################################################################
 # Self Documenting Commands                                                     #
