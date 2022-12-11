@@ -90,7 +90,7 @@ endif
 
 ## Run Fleet
 fleet: install_fleet
-	@echo "Create an instance to remote development using the latest version of Fleet..."
+	@echo "Creating an instance to remote development using the latest version of Fleet..."
 	@fleet launch workspace -- --auth=accept-everyone --publish --enableSmartMode --projectDir=$(PWD)
 
 ## Run VSCode
