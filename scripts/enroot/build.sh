@@ -10,7 +10,6 @@
 # Set arguments
 NVIDIA_RELEASE=21.07
 PYTHON_VERSION_FLAG=py3
-COCO_API_VERSION=v0.6.0
 PLATFORM=tensorflow
 TF_VERSION_FLAG=tf2
 PROJECT=oil-spill-SAR
@@ -18,8 +17,6 @@ WORK_DIR="/workspace/${PROJECT}"
 SQSH_FILENAME=oil-spill-sar+tf2+py3.sqsh
 ROOT_DIR="${HOME}/${PROJECT}"
 SQSH_FILE="${ROOT_DIR}/${SQSH_FILENAME}"
-ESA_SNAP="esa-snap_sentinel_unix_8_0.sh"
-ESA_SNAP_LINK="https://download.esa.int/step/snap/8.0/installers/${ESA_SNAP}"
 
 # Delete any SQSH file locate in the root directory
 if test -f "$SQSH_FILE"; then
@@ -36,10 +33,10 @@ printf "\nCreating an container rootfs (RF) from SQSH file downloaded...\n"
 enroot create --force --name $PROJECT "$SQSH_FILE"
 # Update and install packages
 printf "\nUpdating and installing packages in the container...\n"
-enroot start --root --rw $PROJECT sh -c 'apt update -y && apt install gdal-bin libsqlite3-mod-spatialite -y'
+enroot start --root --rw $PROJECT sh -c "apt update -y && apt install -y openjdk-8-jdk maven"
 # Install Sentinel Application Platform (SNAP) v8
 printf "\nInstalling Sentinel Application Platform (SNAP) v8 in the container...\n"
-enroot start --rw --mount "$PWD":$WORK_DIR $PROJECT sh -c "wget -O ${ESA_SNAP} ${ESA_SNAP_LINK} && chmod +x ${ESA_SNAP} && ./${ESA_SNAP} -q -varfile ${WORK_DIR}/esa-snap_install_unix_8_0.varfile"
+enroot start --rw --mount "$PWD":$WORK_DIR $PROJECT sh -c "cd ${WORK_DIR} && sh scripts/snap/build.sh"
 # Install python dependencies
 printf "\nInstalling python dependencies in the container...\n"
 enroot start --rw --mount "$PWD":$WORK_DIR $PROJECT sh -c "cd ${WORK_DIR} && pip --no-cache-dir install -r requirements.txt"
