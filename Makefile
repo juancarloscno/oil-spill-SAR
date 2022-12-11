@@ -81,8 +81,16 @@ else
 	@echo "Invalid instance size. Please choose from: default, small, medium, large or xlarge"
 endif
 
+
+install_fleet: 
+ifeq (, $(shell which fleet))
+	@echo -e "JetBrains Fleet was not found in PATH.\nJetBrains Fleet will download.\nInstalling JetBrains Fleet..."
+	@curl -LSs "https://download.jetbrains.com/product?code=FLL&release.type=preview&release.type=eap&platform=linux_x64" --output /usr/local/bin/fleet
+	@chmod +x /usr/local/bin/fleet
+endif
+
 ## Run Fleet
-fleet:
+fleet: install_fleet
 	@echo "Create an instance to remote development using the latest version of Fleet..."
 	@fleet launch workspace -- --auth=accept-everyone --publish --enableSmartMode --projectDir=$(PWD)
 
