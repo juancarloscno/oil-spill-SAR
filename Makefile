@@ -14,9 +14,7 @@ PROJECT_NAME = oil-spill-SAR
 #################################################################################
 # PROJECT VARIABLES                                                             #
 #################################################################################
-INSTALL_FLEET_LINK=https://download.jetbrains.com/product?code=FLL&release.type=preview&release.type=eap&platform=linux_x64
-
-
+INSTALL_FLEET_LINK="https://download.jetbrains.com/product?code=FLL&release.type=preview&release.type=eap&platform=linux_x64"
 #################################################################################
 # COMMANDS                                                                      #
 #################################################################################
@@ -80,11 +78,11 @@ else
 	@echo "Invalid instance size. Please choose from: default, small, medium, large or xlarge"
 endif
 
-
+# Install Fleet
 install_fleet: 
-ifeq (, $(shell which fleet))
+ifeq (,$(shell which fleet))
 	@echo -e "JetBrains Fleet was not found in PATH.\nJetBrains Fleet will download.\nInstalling JetBrains Fleet..."
-	@curl -LSs $INSTALL_FLEET_LINK --output /usr/local/bin/fleet
+	@curl -LSs $(INSTALL_FLEET_LINK) --output /usr/local/bin/fleet
 	@chmod +x /usr/local/bin/fleet
 endif
 
