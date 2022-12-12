@@ -1,9 +1,9 @@
 # install4j response file for ESA SNAP 8.0
-deleteSnapDir=ALL
 executeLauncherAction$Boolean=false
+deleteAllSnapEngineDir$Boolean=false
 deleteOnlySnapDesktopDir$Boolean=true
 executeLauncherWithPythonAction$Boolean=false
-forcePython$Boolean=true
+forcePython$Boolean=false
 pythonExecutable=/usr/bin/python
 sys.adminRights$Boolean=true
 sys.component.RSTB$Boolean=false
