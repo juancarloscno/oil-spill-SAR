@@ -78,7 +78,7 @@ else
 	@echo "Invalid instance size. Please choose from: default, small, medium, large or xlarge"
 endif
 
-# Install Fleet
+## Install Fleet
 install_fleet: 
 ifeq (,$(shell which fleet))
 	@echo -e "JetBrains Fleet was not found in PATH.\nJetBrains Fleet will download.\nInstalling JetBrains Fleet..."
@@ -89,7 +89,7 @@ endif
 ## Run Fleet
 fleet: install_fleet
 	@echo "Creating an instance to remote development using the latest version of Fleet..."
-	@fleet launch workspace -- --auth=accept-everyone --publish --enableSmartMode --projectDir=$(PWD)
+	@fleet launch workspace --no-intellij -- --auth=accept-everyone --publish --enableSmartMode --projectDir=$(PWD)
 
 ## Run VSCode
 vscode:
