@@ -17,7 +17,10 @@ ESA_SNAP_LINK="https://download.esa.int/step/snap/8.0/installers/${ESA_SNAP_PKG}
 SNAP_DIR="/opt/snap"
 SNAPPY_DIR="${SNAP_DIR}/snappy"
 JPY_DIR="${SNAP_DIR}/jpy"
-JPY_REPO="https://github.com/bcdev/jpy.git"
+#JPY_REPO="https://github.com/bcdev/jpy.git"
+JPY_REPO="https://github.com/jpy-consortium/jpy.git"
+# Only v0.9.0 is valid, other versions crashes the snappy installation
+JPY_VERSION="0.9.0"
 PYTHON_DIR="/usr/bin/python"
 
 # Download the SNAP installer from the ESA website in temporary folder and execute the installation using the varfile
@@ -42,7 +45,7 @@ fi
 
 # Download the JPY repository from the GitHub and build its wheels
 cd $SNAP_DIR
-git clone $JPY_REPO
+git clone -b $JPY_VERSION $JPY_REPO
 cd jpy
 pip install --upgrade pip wheel
 python setup.py build maven bdist_wheel
@@ -51,6 +54,7 @@ python setup.py build maven bdist_wheel
 JPY_WHEEL=$(find dist -name "*.whl")
 JPY_WHEEL_FILENAME=$(basename "$JPY_WHEEL")
 # Move JPY wheel to snappy folder
+echo -e "\nCopy $JPY_WHEEL to $SNAPPY_DIR/$JPY_WHEEL_FILENAME\n"
 cp "$JPY_WHEEL" "${SNAPPY_DIR}/${JPY_WHEEL_FILENAME}"
 
 # Launch snappy-conf to configure snappy for Python 3.8
@@ -60,12 +64,12 @@ echo -e "\nSNAP has been installed successfully!\n"
 
 # Updating SNAP
 echo -e "\nUpdating SNAP modules..."
-$SNAP/bin/snap --nosplash --nogui --modules --update-all
+$SNAP_DIR/bin/snap --nosplash --nogui --modules --update-all
 echo -e "\nSNAP modules has been updated sucessfully!\n"
 
 # Install Snappy and JPY locally
-cd $SNAPPY_DIR && python setup.py install
-cd $JPY_DIR && python setup.py install
+cd $SNAPPY_DIR/snappy && python setup.py install
+cd $JPY_DIR/dist && pip install $JPY_WHEEL_FILENAME
 
 # Install Snapista
 pip install lxml
