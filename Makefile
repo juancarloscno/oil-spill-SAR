@@ -67,7 +67,7 @@ sync_from_remote: load_dotenv
 allocate_job:
 	@echo "Requesting allocation for $(INSTANCE_SIZE) size instance..."
 ifeq (small,$(INSTANCE_SIZE))
-	@salloc -p gpu-dev -n 1 -c 12 --mem=24576M --gres=gpu:a100_1g.5gb:1 --time=08:00:00
+	@salloc -p gpu-dev -n 1 -c 16 --mem=32768M --gres=gpu:a100_1g.5gb:1 --time=08:00:00
 else ifeq (medium,$(INSTANCE_SIZE))
 	@salloc -p gpu -n 1 -c 16 --mem=32768M --gres=gpu:a100_2g.10gb:1 --time=24:00:00
 else ifeq (large,$(INSTANCE_SIZE))
@@ -89,7 +89,7 @@ endif
 ## Run Fleet
 fleet: install_fleet
 	@echo "Creating an instance to remote development using the latest version of Fleet..."
-	@fleet launch workspace --no-intellij -- --auth=accept-everyone --publish --enableSmartMode --projectDir=$(PWD)
+	@fleet launch workspace -- --auth=accept-everyone --publish --enableSmartMode --projectDir=$(PWD)
 
 ## Run VSCode
 vscode:
