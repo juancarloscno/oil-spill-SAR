@@ -15,7 +15,7 @@ geopandas~=0.12.1
 sentinelsat~=1.1.1
 tabulate~=0.9
 python-dotenv~=0.21
-tiler~=0.5
+tiler==0.5
 geopy~=2.3.0
 cupy-cuda114~=10.6.0
 cachetools~=4.2.2
