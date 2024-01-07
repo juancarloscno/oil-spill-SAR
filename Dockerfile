@@ -11,6 +11,8 @@ ARG NVIDIA_RELEASE=21.07
 ARG PYTHON_VERSION_FLAG=py3
 ARG PLATFORM=tensorflow
 ARG TF_VERSION_FLAG=tf2
+ARG ESA_SNAP="esa-snap_sentinel_unix_8_0.sh"
+ARG ESA_SNAP_URL="https://step.esa.int/downloads/8.0/installers/${ESA_SNAP}"
 
 # Build an image from NVIDIA NGC (Repository for NVIDIA Optimized Frameworks)
 # Release 20.09 is based on CUDA 11.4, which requires NVIDIA driver release 470 or later
@@ -28,6 +30,11 @@ ENV PYTHONPATH="${PYTHONPATH}:$(pwd)"
 
 # Copy requirements.txt to the container at work directory
 COPY requirements.txt .
+COPY esa-snap_install_unix_8_0.varfile .
+
+# Update and install dependencies
+RUN apt update -y && apt install --no-install-recommends gdal-bin libsqlite3-mod-spatialite -y
+RUN wget -o ${ESA_SNAP} ${ESA_SNAP_URL} && chmod +x ${ESA_SNAP} && ./${ESA_SNAP} -q -varfile esa-snap_install_unix_8_0.varfile
 
 # Install dependencies
 RUN pip install -U pip
