@@ -79,6 +79,7 @@ else
 endif
 
 ## Install Fleet
+.PHONY: install_fleet
 install_fleet: 
 ifeq (,$(shell which fleet))
 	@echo -e "JetBrains Fleet was not found in PATH.\nJetBrains Fleet will download.\nInstalling JetBrains Fleet..."
@@ -90,11 +91,6 @@ endif
 fleet: install_fleet
 	@echo "Creating an instance to remote development using the latest version of Fleet..."
 	@fleet launch workspace -- --auth=accept-everyone --publish --enableSmartMode --projectDir=$(PWD)
-
-## Run VSCode
-vscode:
-	@echo "Creating an instance to remote development using Visual Studio Code Server..."
-	@code-server
 
 ## Cancel allocated job on High-Performance Computing (HPC) cluster
 cancel_job:
